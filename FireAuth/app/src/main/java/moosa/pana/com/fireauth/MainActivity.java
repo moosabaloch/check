@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //Commit Changes
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }
