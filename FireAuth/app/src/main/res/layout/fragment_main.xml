@@ -61,5 +61,14 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="47dp" />
 
+    <com.twitter.sdk.android.core.identity.TwitterLoginButton
+        android:id="@+id/twitter_login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/logoutButton"
+        android:layout_alignStart="@+id/logoutButton"
+        android:layout_below="@+id/authButton"
+        android:layout_margin="10dp" />
+
 
 </RelativeLayout>

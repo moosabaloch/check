@@ -30,6 +30,9 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:label="@string/app_name" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="7fd0f25cf3f46244ecdbdb7da7c77f4868882a1e" />
     </application>
 
 </manifest>

@@ -1,14 +1,16 @@
 package moosa.pana.com.fireauth;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
 public class MainActivity extends AppCompatActivity {
+    private MainActivityFragment fragment;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -25,10 +27,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Pass the activity result to the fragment, which will then pass the result to the login
+        // button.
+      /*  Fragment fragment = getFragmentManager().findFragmentById(R.id.fragment);
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }*/
+        fragment.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        Facebook.sdkInitialize(getApplicationContext());
+        fragment = new MainActivityFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, fragment).commit();
     }
 
 

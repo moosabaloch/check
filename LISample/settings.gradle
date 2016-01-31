@@ -1,0 +1,2 @@
+include ':app', ':linked-in-sdk'
+project(':linked-in-sdk').projectDir = new File('app/libs/linkedin-sdk/build.gradle')

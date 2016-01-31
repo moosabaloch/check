@@ -23,10 +23,22 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+import com.twitter.sdk.android.core.models.User;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import retrofit.http.GET;
+import retrofit.http.Query;
 
 
 /**
@@ -41,6 +53,7 @@ public class MainActivityFragment extends Fragment {
     private LoginButton facebookLoginButton;
     private AccessTokenTracker accessTokenTracker;
     private CallbackManager callbackManager;
+    private TwitterLoginButton twitterLoginButton;
 
     public MainActivityFragment() {
     }
@@ -98,6 +111,57 @@ public class MainActivityFragment extends Fragment {
         };
         callbackManager = CallbackManager.Factory.create();
         accessTokenTracker.startTracking();
+
+        ///////////////////Tweet////////////////////////
+        twitterLoginButton = (TwitterLoginButton) view.findViewById(R.id.twitter_login_button);
+        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                Log.d("Twitter", "Logged in as " + result.data.getUserName());
+                Toast.makeText(getActivity(), "Username " + result.data.getUserName(), Toast.LENGTH_LONG).show();
+                // Do something with result, which provides a TwitterSession for making API calls
+                TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                TwitterAuthToken authToken = session.getAuthToken();
+                String token = authToken.token;
+                String secret = authToken.secret;
+                Log.d("Twitter", "Token= " + token + "\n" + "Secret= " + secret);
+                ////////////////////////////One Way to get User Data///////////////////////
+                Twitter.getApiClient().getAccountService().verifyCredentials(true, false, new Callback<User>() {
+                    @Override
+                    public void success(Result<User> result) {
+                        String profileImageUrl = //result.data.profileImageUrl;
+                                result.data.profileImageUrlHttps;
+                        Log.d("Twitter Image URL is ", profileImageUrl.replace("_normal", ""));
+                    }
+
+                    @Override
+                    public void failure(TwitterException e) {
+                        Log.d("Error Getting User", e.getMessage());
+                    }
+                });
+                //////////////////////Another Way to Get User Data//////////////////////////
+               /* new MyTwitterApiClient(session).getUsersService().show(result.data.getUserId(),session.getUserName(), true,
+                        new Callback<User>() {
+                            @Override
+                            public void success(Result<User> result) {
+                                Log.d("twitter", "user's profile url is "
+                                        + result.data.profileImageUrlHttps);
+                            }
+
+                            @Override
+                            public void failure(TwitterException exception) {
+                                Log.d("twitter", "exception is " + exception);
+                            }
+                        });
+                Toast.makeText(getActivity(), token + "=" + secret, Toast.LENGTH_LONG).show();*/
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                // Do something on failure
+                Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
         return view;
     }
 
@@ -105,8 +169,11 @@ public class MainActivityFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
 
+        // Pass the activity result to the login button.
+        twitterLoginButton.onActivityResult(requestCode, resultCode, data);
+
+    }
 
     private void updateWithToken() {
 
@@ -143,7 +210,7 @@ public class MainActivityFragment extends Fragment {
 
                         }
                     });
-                   ////////////////////////////////////////////////////////
+                    ////////////////////////////////////////////////////////
 
 
                     Log.d("User Id - ", uuid + "");
@@ -277,6 +344,25 @@ public class MainActivityFragment extends Fragment {
 
     private void fbLogin() {
 
+    }
+
+    interface UsersService {
+        @GET("/1.1/users/show.json")
+        void show(@Query("user_id") Long userId,
+                  @Query("screen_name") String screenName,
+                  @Query("include_entities") Boolean includeEntities,
+                  Callback<User> cb);
+    }
+
+    ////////////////////Twitter Class for User Data///////////////////
+    class MyTwitterApiClient extends TwitterApiClient {
+        public MyTwitterApiClient(TwitterSession session) {
+            super(session);
+        }
+
+        public UsersService getUsersService() {
+            return getService(UsersService.class);
+        }
     }
 
 }

@@ -8,6 +8,9 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by Moosa on 9/2/2015.
@@ -19,6 +22,11 @@ import com.firebase.client.Firebase;
  * TOTAL_HOURS_WASTED_HERE=1
  */
 public class MyApplication extends android.app.Application {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "DlNbeknOPLZarMWF24yViTEQD";
+    private static final String TWITTER_SECRET = "xPWOCExY4T8ewe8HgQESHKmkImDqRenGAmW3StW7OJO03BEXCZ";
+
     public static final String TAG = MyApplication.class
             .getSimpleName();
     private static MyApplication mInstance;
@@ -32,6 +40,8 @@ public class MyApplication extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         mInstance = this;
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(this);
